@@ -26,6 +26,14 @@ function ES6Concatenator(inputTree, options) {
   }
 }
 
+ES6Concatenator.prototype.afterCompile = function(compiledModule, modulePath) {
+  if(typeof this.afterCompileWith === 'function'){
+    return this.afterCompileWith(compiledModule, modulePath);
+  } else {
+    return compiledModule;
+  }
+}
+
 ES6Concatenator.prototype.getWrapInEval = function () {
   // default to true for now
   return this.wrapInEval == null ? true : this.wrapInEval
@@ -108,6 +116,7 @@ ES6Concatenator.prototype.write = function (readTree, destDir) {
             }
           }
           var compiledModule = compiler.toAMD()
+          compiledModule = self.afterCompile(compiledModule, modulePath)
           if (self.getWrapInEval()) {
             compiledModule = wrapInEval(compiledModule, modulePath)
           }
